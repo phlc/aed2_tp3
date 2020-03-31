@@ -250,14 +250,63 @@ class Personagem {
 //ler
 	/*
 	*ler
-	*@return
+	*@return String com dados do personagem
 	*/
 	public String ler(){
-		return( " ## "+this.nome+" ## "+this.altura+" ## "+this.peso+
-		       " ## "+this.corDoCabelo+" ## "+this.corDaPele+" ## "+
-		       this.corDosOlhos+" ## "+this.anoNascimento+" ## "+this.genero+
-		       " ## "+this.homeworld+" ## ");	
+		String s = " ## "+this.nome+" ## "+this.altura+" ## ";
+
+		if (this.peso%1==0)
+			s = s + (int)this.peso;
+		else
+			s = s + this.peso;
+		s = s + " ## "+this.corDoCabelo+" ## "+this.corDaPele+" ## "+ 
+		        this.corDosOlhos+" ## "+this.anoNascimento+" ## "+this.genero+
+		        " ## "+this.homeworld+" ## ";	
+		return s;
 	}
+
+//compareTo
+	/*
+	*@param Personagem a ser comparado e int da operacao
+	*@return <0 se this menor q param, 0 se igual, >0 se maior
+	*/
+	public double compareTo (Personagem p, int op){
+		double resp = 0.0;
+	
+		switch (op){	
+			case 1:
+  			 resp = this.altura - p.altura;
+			 break;
+			case 2:
+			 resp = this.peso - p.peso;
+			 break;
+			case 3:
+			 resp = this.corDoCabelo.compareTo(p.corDoCabelo);
+			 break;
+			case 4:
+			 resp = this.corDaPele.compareTo(p.corDaPele);
+			 break;
+			case 5:
+			 resp = this.corDosOlhos.compareTo(p.corDosOlhos);
+			 break;
+			case 6:
+			 resp = this.anoNascimento.compareTo(p.anoNascimento);
+			 break;
+			case 7:
+			 resp = this.genero.compareTo(p.genero);
+			 break;
+			case 8:
+			 resp = this.homeworld.compareTo(p.homeworld);
+			 break;
+			default:
+				resp = this.nome.compareTo(p.nome);
+		}
+		
+		if (resp==0){
+			resp = this.nome.compareTo(p.nome);
+		}
+		return resp;
+	}	
 
 //metodos estaticos publicos
 
@@ -388,7 +437,7 @@ class Lista{
 	*inserir - insere um elemento em determinada posicao
 	*@param Personagem elemento, int pos;
 	*/
-	public void inserir(Personagem p, int tamanho) throws Exception{
+	public void inserir(Personagem p, int pos) throws Exception{
 		int tamanho = tamanho();
 		
 		if (pos>tamanho || pos<0)
@@ -458,7 +507,7 @@ class Lista{
 			p=removerInicio();
 		else if (pos==tamanho-1)
 			p=removerFim();
-		else if{
+		else{
 			Celula i = primeiro;
 			for(int j=0; j<pos; j++, i=i.prox);
 			
@@ -472,6 +521,59 @@ class Lista{
 		
 		return p;
 	}
+
+ //mostrar
+	/**
+	*mostrar lista
+	*/
+	public void mostrar(){
+		int j=0;
+		for (Celula i=primeiro.prox; i!=null; i=i.prox, j++){
+			MyIO.println("["+j+"] "+ i.elemento.ler());
+		}
+	}
+
+ //comandos
+	/**
+	*comandos - executa os comandos contidos em um string
+	*@param String com comandos
+	*/
+	public void comandos(String s) throws Exception{
+		String[] parsed = s.split(" ");
+		
+		if (parsed[0].equals("II")){
+			this.inserirInicio(new Personagem(parsed[1]));
+		}
+		else if (parsed[0].equals("IF")){
+			this.inserirFim(new Personagem(parsed[1]));
+		}
+		else if (parsed[0].equals("I*")){
+			this.inserir(new Personagem(parsed[2]), Integer.parseInt(parsed[1]));
+		}
+		else if (parsed[0].equals("RI")){
+			Personagem p = this.removerInicio();
+			MyIO.println("(R) "+p.getNome());
+		}
+		else if (parsed[0].equals("RF")){
+			Personagem p = this.removerFim();
+			MyIO.println("(R) "+p.getNome());
+		}		
+		else if (parsed[0].equals("R*")){
+			Personagem p = this.remover(Integer.parseInt(parsed[1]));
+			MyIO.println("(R) "+p.getNome());
+
+		}
+	}
+	
+ //zerarPeso
+	/**
+	*zerarPeso - zera o peso dos elementos da lista
+	*/
+	public void zerarPeso(){
+		for (Celula i=primeiro.prox; i!=null; i=i.prox){
+			i.elemento.setPeso(0.0);
+		}
+	}
 }
 
 
@@ -479,22 +581,34 @@ class Lista{
 *Classe Main
 */
 public class TP03Q01{
-	
+		
 	/**
 	*Metodo main
 	*/
 	public static void main(String[] args) throws Exception{
+		Lista list = new Lista();
 
-		Personagem p;
 		String input = MyIO.readLine();
 		input = Personagem.toUtf(input);
 		while(!Personagem.isFim(input)){
-			p = new Personagem(input);
-			p.imprimir();
+			list.inserirFim( new Personagem(input));
 			input = MyIO.readLine();
 			input = Personagem.toUtf(input);
-		}	
+		}
+		
+		int n = MyIO.readInt();
+		
+		for (int i=0; i<n; i++){
+			input = MyIO.readLine();
+			input = Personagem.toUtf(input);
+			list.comandos(input);	
+		}
 
+		//zerar peso
+		list.zerarPeso();
+
+		list.mostrar();
 	}	
+
 
 }
