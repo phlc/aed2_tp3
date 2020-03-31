@@ -315,6 +315,105 @@ class Personagem {
 }
 
 /**
+*Classe Celula
+*/
+class Celula{
+ //atributos
+	public Personagem elemento;
+	public Celula prox;
+
+ //construtores
+	public Celula(Personagem p){
+		this.elemento=p;
+		this.prox=null;
+	}
+	
+	public Celula(){
+		this.elemento=null;
+		this.prox=null;
+	}
+}
+
+/**
+*Classe Lista Flexivel
+*/
+class Lista{
+ //atributos
+	private Celula primeiro;
+	private Celula ultimo;
+
+ //contrutotres
+	public Lista(){
+		this.primeiro = new Celula();
+		this.ultimo = primeiro;
+	}
+
+//inserir
+	/**
+	*inserirInicio - insere um elemento no inicio da lista
+	*@param Personagem elemento
+	*/
+	public void inserirInicio(Personagem p){
+		Celula tmp = new Celula(p);
+		tmp.prox=primeiro.prox;
+		primeiro.prox=tmp;
+		if (primeiro==ultimo)
+			ultimo=primeiro.prox;
+		tmp=null;
+	}
+
+	/**
+	*inserirFim - insere um elemento no fim da lista
+	*@param Personagem elemento
+	*/
+	public void inserirFim(Personagem p){
+		ultimo.prox = new Celula(p);
+		ultimo=ultimo.prox;
+
+	}
+
+	/**
+	*tamanho - retorna o tamanho da lista
+	*@return tamanho int
+	*/
+	private int tamanho(){
+		int resp = 0;
+		for(Celula i=primeiro.prox; i!=null; i=i.prox){
+			resp++;
+		}
+		return resp;
+	}
+
+	/**
+	*inserir - insere um elemento em determinada posicao
+	*@param Personagem elemento, int pos;
+	*/
+	public void inserir(Personagem p, int tamanho) throws Exception{
+		int tamanho = tamanho();
+		
+		if (pos>tamanho || pos<0)
+			throw new Exception ("Posicao Inexistente");
+		else if (pos==tamanho)
+			inserirFim(p);
+		else if (pos==0)
+			inserirInicio(p);
+		else{
+			Celula i=primeiro;
+			for(int j=0; j<pos; j++, i=i.prox);
+			
+			Celula tmp = new Celula(p);
+			tmp.prox = i.prox;
+			i.prox=tmp;
+			i=tmp=null;
+		}
+
+	}
+
+ //remover
+ 
+}
+
+/**
 *Classe Main
 */
 public class TP03Q01{
