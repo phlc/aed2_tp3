@@ -410,8 +410,70 @@ class Lista{
 	}
 
  //remover
- 
+	/**
+	*removerInicio - remove um elemento do inicio da lista
+	*@return Personagem elemento
+	*/
+	public Personagem removerInicio() throws Exception{
+		if(primeiro==ultimo)
+			throw new Exception("Lista Vazia");
+		
+		Celula tmp = primeiro;
+		primeiro = primeiro.prox;
+		tmp.prox=null;
+		tmp=null;
+		return (primeiro.elemento);
+		
+	}
+
+	/*removerFim - remove um elemento do fim da lista
+	*@return Personagem elemento
+	*/
+	public Personagem removerFim() throws Exception{
+		if(primeiro==ultimo)
+			throw new Exception("Lista Vazia");
+		
+		Celula i;
+		for(i=primeiro; i.prox!=ultimo; i=i.prox);
+		
+		Personagem p=ultimo.elemento;
+	
+		ultimo=i;
+		i=ultimo.prox=null;		
+	
+		return p;
+	}
+	
+	/*remover - remove um elemento da posicao
+	*@param int posicao
+	*@return Personagem p
+	*/
+	public Personagem remover(int pos) throws Exception{
+		int tamanho = tamanho();
+		Personagem p;
+
+		if(pos<0 || pos>tamanho-1)
+			throw new Exception("Posicao Inexistente");
+		else if (pos==0)
+			p=removerInicio();
+		else if (pos==tamanho-1)
+			p=removerFim();
+		else if{
+			Celula i = primeiro;
+			for(int j=0; j<pos; j++, i=i.prox);
+			
+			Celula tmp=i.prox;
+			p=tmp.elemento;
+				
+			i.prox=tmp.prox;
+			tmp.prox=null;
+			i=tmp=null;
+		}
+		
+		return p;
+	}
 }
+
 
 /**
 *Classe Main
