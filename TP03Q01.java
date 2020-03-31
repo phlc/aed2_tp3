@@ -605,7 +605,7 @@ public class TP03Q01{
 		}
 
 		//zerar peso
-		list.zerarPeso();
+//		list.zerarPeso();
 
 		list.mostrar();
 	}	
