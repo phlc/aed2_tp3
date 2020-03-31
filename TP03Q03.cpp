@@ -4,7 +4,7 @@ Pedro Henrique Lima Carvalho
 Matricula: 651230
 AEDs 2
 
-TP03 - Q03
+TP02 - Q04
 */
 
 //dependencias
@@ -12,6 +12,7 @@ TP03 - Q03
 #include <stdlib.h>
 #include <string.h>
 
+// ----------------------------------- Personagem  ---------------------------------
 
 /**
 * Struct Personagem
@@ -293,11 +294,163 @@ void preencherPersonagem(Personagem* p_person, char* s){
 	strcpy(p_person->homeworld, buffer[8]);
 		
 }
+//----------------------------------- Fila Circular ---------------------------------
+
+/**
+*struct Fila
+*/
+typedef struct Fila{
+ 
+//atributos
+	int tamanho;
+	int inicio;
+	int fim;
+	Personagem** list;
+}Fila;
+
+//construtor
+/**
+*construtorFila - inicializa uma Fila
+*@param int tamanho
+*@return list*
+*/
+Fila* construtorFila (int size){
+
+	Fila* p_fila;
+
+	if (size < 1){
+		printf("%s\n", "Erro - Tamanho da Lista Invalido");
+	}
+	else{
+		p_fila = (Fila*) malloc (sizeof(Fila)*1);	
+		p_fila->tamanho = size;
+		p_fila->inicio = 0;
+		p_fila->fim = 0;
+		p_fila->list = (Personagem**) malloc(sizeof(Personagem*)*size);
+	}
+	return p_fila;
+}
+
+//metodos
+
+/**
+*desenfileirar - remove um elemento inicio da fila
+*@return Personagem*
+*/
+Personagem* desenfileirar (Fila* p_fila){
+	Personagem* p_person;
+
+	if (p_fila->inicio == p_fila->fim){
+		printf("%s\n", "Erro - fila Vazia");
+	}
+	else{
+		p_person = p_fila->list[(p_fila->inicio)%p_fila->tamanho];
+		p_fila->inicio++;
+	}
+	return p_person;
+}
+
+//declaracao de mediaAlturas
+void mediaAltura(Fila* p_fila);
+
+/**
+*enfileirar - insere um elemento no final da fila
+*@param Fila* Personagem*
+*/
+void enfileirar(Fila* p_fila, Personagem* p_person){
+	if ((p_fila->fim+1)%p_fila->tamanho != p_fila->inicio%p_fila->tamanho){
+
+		//zerar pesos
+		p_person->peso = 0.0;
+
+
+		p_fila->list[p_fila->fim%p_fila->tamanho]=p_person;
+		p_fila->fim++;
+
+		//media alturas
+		mediaAltura(p_fila);
+
+	}
+	else{
+		desenfileirar (p_fila);
+		enfileirar(p_fila, p_person);
+	}
+	
+	
+}
+
+/**
+*mostrar fila
+*@param Fila*
+*/
+void mostrar(Fila* p_fila){
+	for (int i=p_fila->inicio; i<p_fila->fim; i++){
+		printf("%s%d%s", "[", i, "] ");
+		imprimir(p_fila->list[i%p_fila->tamanho]);
+	} 
+}
+
+/**
+*comandos - executa os comandos contidos em uma string
+*@param Fila*. char* com comando
+*/
+void comandos (Fila* p_fila, char* input){
+	char* cmd;
+	char* path;
+	Personagem* p_person;
+
+	cmd = strtok(input, " ");
+
+	if (strcmp(cmd, "I")==0){
+		path = strtok (NULL, " ");
+		p_person = constructor2(path);
+		enfileirar(p_fila, p_person);
+	}	
+
+	if (strcmp(cmd, "R")==0){
+		p_person = desenfileirar(p_fila);
+		printf("%s%s\n", "(R) ", p_person->nome);
+		freePerson(p_person);
+	}
+}
+
+/**
+*freeFila - libera a memoria da fila
+*@param Lista*
+*/
+void freeFila (Fila* p_fila){
+	for (int i=p_fila->inicio; i<p_fila->fim; i++){
+		freePerson(p_fila->list[i%p_fila->tamanho]);
+	}
+	free(p_fila);
+}
+
+/**
+*mediaAlturas
+*@param Fila*
+*/
+void mediaAltura(Fila* p_fila){
+	double m = 0.0;
+	for (int i=p_fila->inicio; i<p_fila->fim; i++){
+		m = m + p_fila->list[i%p_fila->tamanho]->altura;
+	}
+	m = m/(p_fila->fim - p_fila->inicio);
+	
+	if (m-(int)m >= 0.5)
+		m += 0.5;
+	printf("%d\n",(int) m);
+}
+
+
+//----------------------------------- Main ---------------------------------
+
 
 /**
 *Metodo main
 */
 int  main(void){
+        
+	Fila* p_fila = construtorFila(6);
 
 	Personagem* p;
 	char* input = (char*) malloc(sizeof(char) * 100);
@@ -307,12 +460,23 @@ int  main(void){
 		
 	while(!isFim(input)){
 		p = constructor2(input);
-		imprimir(p);
-		freePerson(p);
-		free(p);
+		enfileirar(p_fila, p);
 		fgets(input, 99, stdin);
 		input[strlen(input)-1]='\0';
 	}	
+	int n = 0;
+
+	fgets(input, 99, stdin);
+	input[strlen(input)-1]='\0';
+	sscanf(input, "%d", &n);
+
+	for (int i=0; i<n; i++){
+		fgets(input, 99, stdin);
+		input[strlen(input)-1]='\0';
+		comandos(p_fila, input);
+	}
+	mostrar(p_fila);
+	freeFila(p_fila);
 }	
 
 
