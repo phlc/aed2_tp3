@@ -4,7 +4,7 @@ Pedro Henrique Lima Carvalho
 Matricula: 651230
 AEDs 2
 
-TP02 - Q04
+TP03 - Q03
 */
 
 //dependencias
@@ -294,7 +294,30 @@ void preencherPersonagem(Personagem* p_person, char* s){
 	strcpy(p_person->homeworld, buffer[8]);
 		
 }
-//----------------------------------- Fila Circular ---------------------------------
+//------------------------------------ Celula ----------------------------------------------
+
+/**
+*struct Celula
+*/
+typedef struct Celula{
+ 
+ //atributos 
+	Personagem* elemento;
+	Celula* prox;
+
+}Celula;
+
+ //construtor
+	Celula* construtorCelula (Personagem* p){
+		Celula* cel = (Celula*) malloc(sizeof(Celula));
+		
+		cel->elemento = p;
+		cel->prox = NULL;
+		
+		return cel;
+	}
+
+//------------------------------- Fila Flexivel "Circular" ---------------------------------
 
 /**
 *struct Fila
@@ -303,9 +326,9 @@ typedef struct Fila{
  
 //atributos
 	int tamanho;
-	int inicio;
-	int fim;
-	Personagem** list;
+	int ocupados;
+	Celula* primeiro;
+	Celula* ultimo;
 }Fila;
 
 //construtor
@@ -324,9 +347,9 @@ Fila* construtorFila (int size){
 	else{
 		p_fila = (Fila*) malloc (sizeof(Fila)*1);	
 		p_fila->tamanho = size;
-		p_fila->inicio = 0;
-		p_fila->fim = 0;
-		p_fila->list = (Personagem**) malloc(sizeof(Personagem*)*size);
+		p_fila->ocupados = 0;
+		p_fila->primeiro = construtorCelula (NULL);
+		p_fila->ultimo = p_fila->primeiro;
 	}
 	return p_fila;
 }
@@ -340,12 +363,17 @@ Fila* construtorFila (int size){
 Personagem* desenfileirar (Fila* p_fila){
 	Personagem* p_person;
 
-	if (p_fila->inicio == p_fila->fim){
+	if (p_fila->primeiro == p_fila->ultimo){
 		printf("%s\n", "Erro - fila Vazia");
 	}
 	else{
-		p_person = p_fila->list[(p_fila->inicio)%p_fila->tamanho];
-		p_fila->inicio++;
+		Celula* tmp = p_fila->primeiro;
+		p_fila->primeiro = p_fila->primeiro->prox;
+		p_person = p_fila->primeiro->elemento;
+		p_fila->primeiro->elemento=NULL;
+		p_fila->ocupados--;
+		free(tmp);
+		
 	}
 	return p_person;
 }
@@ -358,21 +386,19 @@ void mediaAltura(Fila* p_fila);
 *@param Fila* Personagem*
 */
 void enfileirar(Fila* p_fila, Personagem* p_person){
-	if ((p_fila->fim+1)%p_fila->tamanho != p_fila->inicio%p_fila->tamanho){
+	if (p_fila->ocupados < p_fila->tamanho){
 
-		//zerar pesos
-		p_person->peso = 0.0;
-
-
-		p_fila->list[p_fila->fim%p_fila->tamanho]=p_person;
-		p_fila->fim++;
+		p_fila->ultimo->prox = construtorCelula(p_person);
+		p_fila->ultimo=p_fila->ultimo->prox;
+		p_fila->ocupados++;		
 
 		//media alturas
 		mediaAltura(p_fila);
 
 	}
 	else{
-		desenfileirar (p_fila);
+		Personagem* p = desenfileirar (p_fila);
+		freePerson(p);
 		enfileirar(p_fila, p_person);
 	}
 	
@@ -384,9 +410,10 @@ void enfileirar(Fila* p_fila, Personagem* p_person){
 *@param Fila*
 */
 void mostrar(Fila* p_fila){
-	for (int i=p_fila->inicio; i<p_fila->fim; i++){
-		printf("%s%d%s", "[", i, "] ");
-		imprimir(p_fila->list[i%p_fila->tamanho]);
+	int j=0;
+	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox, j++){
+		printf("%s%d%s", "[", j, "] ");
+		imprimir(i->elemento);
 	} 
 }
 
@@ -419,8 +446,18 @@ void comandos (Fila* p_fila, char* input){
 *@param Lista*
 */
 void freeFila (Fila* p_fila){
-	for (int i=p_fila->inicio; i<p_fila->fim; i++){
-		freePerson(p_fila->list[i%p_fila->tamanho]);
+	
+	Celula* i = p_fila->primeiro->prox;
+	free(p_fila->primeiro);
+	p_fila->ultimo=NULL;
+	if (i!=NULL){
+		for (Celula* j = i->prox; j!=NULL; j=j->prox){
+			freePerson(i->elemento);
+			free(i);
+			i=j;
+		}	
+		freePerson(i->elemento);
+		free(i);
 	}
 	free(p_fila);
 }
@@ -431,10 +468,10 @@ void freeFila (Fila* p_fila){
 */
 void mediaAltura(Fila* p_fila){
 	double m = 0.0;
-	for (int i=p_fila->inicio; i<p_fila->fim; i++){
-		m = m + p_fila->list[i%p_fila->tamanho]->altura;
+	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox){
+		m = m + i->elemento->altura;
 	}
-	m = m/(p_fila->fim - p_fila->inicio);
+	m = m/(p_fila->ocupados);
 	
 	if (m-(int)m >= 0.5)
 		m += 0.5;
@@ -450,7 +487,7 @@ void mediaAltura(Fila* p_fila){
 */
 int  main(void){
         
-	Fila* p_fila = construtorFila(6);
+	Fila* p_fila = construtorFila(5);
 
 	Personagem* p;
 	char* input = (char*) malloc(sizeof(char) * 100);
