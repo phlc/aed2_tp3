@@ -723,6 +723,7 @@ public class TP03Q04{
 		//arquivo log
 		Arq.openWrite("651230_quicksort2.txt");
 		Arq.print("651230\t"+log[0]+"\t"+log[1]+"\t"+segundos);
+		Arq.close();		
 
 		list.mostrar('c');
 	}	
