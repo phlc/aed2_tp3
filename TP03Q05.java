@@ -172,8 +172,8 @@ class Matrix{
 		if(l>nLinhas() || c>nColunas())
 			throw new Exception("Posicao Inexistente");
 		Celula tmp=inicio;
-		for(int i=0; i<l; i++, tmp=tmp.dir);
-		for(int i=0; i<c; i++, tmp=tmp.inf);
+		for(int i=0; i<l; i++, tmp=tmp.inf);
+		for(int i=0; i<c; i++, tmp=tmp.dir);
 
 		tmp.elemento=x;
 		tmp=null;
@@ -254,24 +254,36 @@ class Matrix{
 
 public class TP03Q05{
 	public static void main (String[] args) throws Exception{
-		Matrix matriz1 = new Matrix(5, 5);
-		Matrix matriz2 = new Matrix(5, 5);
-		int n=1;
-		int m=2;
-		for (int i=0; i<5; i++){
-			for(int j=0; j<5; j++){
-				matriz1.inserir(n, j, i);
-				matriz2.inserir(m, j, i);
+		int testes = MyIO.readInt();
+		
+		for (int i=0; i<testes; i++){
+			int linhas = MyIO.readInt();
+			int colunas = MyIO.readInt();
+			
+			Matrix matriz1 = new Matrix(linhas, colunas);
+			
+			for (int l=0; l<linhas; l++){
+				for(int c=0; c<colunas; c++){
+					matriz1.inserir(MyIO.readInt(), l, c);
+				}
+			}	
+			linhas = MyIO.readInt();
+			colunas = MyIO.readInt();
+			
+			Matrix matriz2 = new Matrix(linhas, colunas);
+			
+			for (int l=0; l<linhas; l++){
+				for(int c=0; c<colunas; c++){
+					matriz2.inserir(MyIO.readInt(), l, c);
+				}
 			}
-		}
-		matriz1.mostrarPrincipal();
-		matriz2.mostrarSecundaria();
-		matriz1.mostrar();
-		matriz2.mostrar();
-		Matrix matriz3 = matriz1.somar(matriz2);
-		matriz3.mostrar();
-		matriz3 = matriz1.multiplicar(matriz2);
-		matriz3.mostrar();	
+			
+			matriz1.mostrarPrincipal();
+			matriz1.mostrarSecundaria();
+			Matrix matriz3 = matriz1.somar(matriz2);
+			matriz3.mostrar();
+			matriz3 = matriz1.multiplicar(matriz2);
+			matriz3.mostrar();
+  		}		
 	}
-
 }
