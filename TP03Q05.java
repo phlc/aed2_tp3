@@ -145,6 +145,25 @@ class Matrix{
 	}
 
 	/*
+	*nLinhas - conta o numero de linhas da matriz
+	*@return int numero de linhas
+	*/
+	public int nLinhas(){
+		int n=0;
+		for(Celula i=inicio; i!=null; i=i.dir. n++);
+		return n;
+	}
+
+	/*
+	*nColunas - conta o numero de colunas da matriz
+	*@return int numero de colunas
+	*/
+	public int nColunas(){
+		int n=0;
+		for(Celula i=inicio; i!=null; i=i.inf, n++);
+	}
+	
+	/*
 	*inserir - inserer um elemento na matriz
 	*@param int elemento, int linha, int coluna
 	*/
@@ -155,6 +174,15 @@ class Matrix{
 
 		tmp.elemento=x;
 		tmp=null;
+	}
+
+	/*somar - soma duas matrizes
+	*@param matriz a ser somada com objeto
+	*@return Matriz resultante
+	*/
+	public Matrix somar(Matrix b){
+	
+
 	}
 }
 
