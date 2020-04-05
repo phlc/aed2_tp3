@@ -148,7 +148,7 @@ class Matrix{
 	*nLinhas - conta o numero de linhas da matriz
 	*@return int numero de linhas
 	*/
-	public int nLinhas(){
+	private int nLinhas(){
 		int n=0;
 		for(Celula i=inicio; i!=null; i=i.dir, n++);
 		return n;
@@ -158,7 +158,7 @@ class Matrix{
 	*nColunas - conta o numero de colunas da matriz
 	*@return int numero de colunas
 	*/
-	public int nColunas(){
+	private int nColunas(){
 		int n=0;
 		for(Celula i=inicio; i!=null; i=i.inf, n++);
 		return n;
@@ -203,9 +203,50 @@ class Matrix{
 				b_cel=b_cel.dir;
 				resp_cel=resp_cel.dir;
 			}				
-			a_linha = a_cel =a_linha.inf;
-			b_linha = b_cel =b_linha.inf;
+			a_linha = a_cel = a_linha.inf;
+			b_linha = b_cel = b_linha.inf;
 			resp_linha = resp_cel = resp_linha.inf;
+		}
+		return resp;
+	}
+
+	private static int mult(Celula a, Celula b){
+		int resp = 0;
+		while (a!=null && b!=null){
+			resp = resp + a.elemento * b.elemento;
+	
+			a=a.dir;
+			b=b.inf;
+		}
+		return resp;
+	}
+
+	/*multiplicar - multiplica duas matrizes
+	*@param matriz a ser multiplicada com objeto
+	*@return Matriz resultante
+	*/
+	public Matrix multiplicar(Matrix b) throws Exception{
+		if (this.nLinhas()!=b.nColunas()||this.nColunas()==0||b.nLinhas()==0||b.nColunas()==0)
+			throw new Exception("Matriz vazia");
+		Matrix resp = new Matrix (this.nLinhas(), b.nColunas());
+
+		Celula a_linha, b_coluna, resp_linha, resp_cel;
+
+		a_linha  = this.inicio;	
+		b_coluna  = b.inicio;
+		resp_linha = resp_cel = resp.inicio;
+			
+		while(resp_linha!=null){
+			while(resp_cel!=null){
+				resp_cel.elemento = mult(a_linha, b_coluna);
+				
+				resp_cel=resp_cel.dir;
+				b_coluna=b_coluna.dir;
+			}
+			
+			resp_linha=resp_cel=resp_linha.inf;
+			b_coluna=b.inicio;
+			a_linha=a_linha.inf;
 		}
 		return resp;
 	}
@@ -228,6 +269,8 @@ public class TP03Q05{
 		matriz1.mostrar();
 		matriz2.mostrar();
 		Matrix matriz3 = matriz1.somar(matriz2);
+		matriz3.mostrar();
+		matriz3 = matriz1.multiplicar(matriz2);
 		matriz3.mostrar();	
 	}
 
