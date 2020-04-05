@@ -1,5 +1,10 @@
-
-import java.util.Scanner;
+/*
+Ciencia da Computacao - Pucminas
+AEDs II
+Pedro Henrique Lima Carvalho
+Matricula: 651230
+TP 3 - Q05
+*/
 
 class Celula{
 	//atributos
@@ -64,13 +69,51 @@ class MatrixDinamica{
 
 	}
 
-	
+	public void mostrar(){
+		Celula i = inicio;
+		
+		while(i!=null){
+			for (Celula j=i; j!=null; j=j.dir){
+				MyIO.print(i.elemento+" ");
+			}
+			MyIO.println("");	
+			i=i.inf;
+		}
+	}
 
+	public void mostrarPrincipal(){
+		Celula i = inicio;
+
+		while(i!=null){
+			MyIO.print(i.elemento+" ");
+			i=i.dir;
+			if(i!=null)
+				i=i.inf;
+		}
+		MyIO.println("");
+	}	
+
+	public void mostrarSecundaria(){
+		Celula i = inicio;
+		for(; i.dir!=null; i=i.dir);
+	
+		while(i!=null){
+			MyIO.print(i.elemento+" ");
+			i=i.esq;
+			if(i!=null)
+				i=i.inf;
+		}
+		MyIO.println("");
+	}
 }
 
-public class Matrix{
+public class TP03Q05{
 	public static void main (String[] args){
 		MatrixDinamica matriz = new MatrixDinamica(5, 5);
+		
+		matriz.mostrarPrincipal();
+		matriz.mostrarSecundaria();
+		matriz.mostrar();
 	}
 
 }
