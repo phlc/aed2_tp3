@@ -150,7 +150,7 @@ class Matrix{
 	*/
 	public int nLinhas(){
 		int n=0;
-		for(Celula i=inicio; i!=null; i=i.dir. n++);
+		for(Celula i=inicio; i!=null; i=i.dir, n++);
 		return n;
 	}
 
@@ -161,13 +161,16 @@ class Matrix{
 	public int nColunas(){
 		int n=0;
 		for(Celula i=inicio; i!=null; i=i.inf, n++);
+		return n;
 	}
 	
 	/*
 	*inserir - inserer um elemento na matriz
 	*@param int elemento, int linha, int coluna
 	*/
-	public void inserir(int x, int l, int c){
+	public void inserir(int x, int l, int c) throws Exception{
+		if(l>nLinhas() || c>nColunas())
+			throw new Exception("Posicao Inexistente");
 		Celula tmp=inicio;
 		for(int i=0; i<l; i++, tmp=tmp.dir);
 		for(int i=0; i<c; i++, tmp=tmp.inf);
@@ -180,14 +183,36 @@ class Matrix{
 	*@param matriz a ser somada com objeto
 	*@return Matriz resultante
 	*/
-	public Matrix somar(Matrix b){
-	
+	public Matrix somar(Matrix b) throws Exception{
+		if(this.nLinhas() != b.nLinhas() || this.nColunas() !=b.nColunas())
+			throw new Exception("Matrizes de tamanhos diferentes");
 
+		Matrix resp = new Matrix(this.nLinhas(), this.nColunas());
+
+		Celula a_linha, a_cel, b_linha, b_cel, resp_linha, resp_cel;
+
+		a_linha = a_cel = this.inicio;	
+		b_linha =  b_cel = b.inicio;
+		resp_linha = resp_cel = resp.inicio;
+	
+		while(a_linha!=null || b_linha!=null || resp_linha!=null){
+			while(a_cel!=null || b_cel!=null || resp_cel!=null){
+				resp_cel.elemento = a_cel.elemento + b_cel.elemento;
+				
+				a_cel=a_cel.dir;
+				b_cel=b_cel.dir;
+				resp_cel=resp_cel.dir;
+			}				
+			a_linha = a_cel =a_linha.inf;
+			b_linha = b_cel =b_linha.inf;
+			resp_linha = resp_cel = resp_linha.inf;
+		}
+		return resp;
 	}
 }
 
 public class TP03Q05{
-	public static void main (String[] args){
+	public static void main (String[] args) throws Exception{
 		Matrix matriz1 = new Matrix(5, 5);
 		Matrix matriz2 = new Matrix(5, 5);
 		int n=1;
@@ -201,8 +226,9 @@ public class TP03Q05{
 		matriz1.mostrarPrincipal();
 		matriz2.mostrarSecundaria();
 		matriz1.mostrar();
-		matriz2.mostrar()
-		
+		matriz2.mostrar();
+		Matrix matriz3 = matriz1.somar(matriz2);
+		matriz3.mostrar();	
 	}
 
 }
