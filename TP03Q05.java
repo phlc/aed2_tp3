@@ -160,18 +160,21 @@ class Matrix{
 
 public class TP03Q05{
 	public static void main (String[] args){
-		Matrix matriz = new Matrix(5, 5);
-		
+		Matrix matriz1 = new Matrix(5, 5);
+		Matrix matriz2 = new Matrix(5, 5);
 		int n=1;
+		int m=2;
 		for (int i=0; i<5; i++){
 			for(int j=0; j<5; j++){
-				matriz.inserir(n, j, i);
-				n++;
+				matriz1.inserir(n, j, i);
+				matriz2.inserir(m, j, i);
 			}
 		}
-		matriz.mostrarPrincipal();
-		matriz.mostrarSecundaria();
-		matriz.mostrar();
+		matriz1.mostrarPrincipal();
+		matriz2.mostrarSecundaria();
+		matriz1.mostrar();
+		matriz2.mostrar()
+		
 	}
 
 }
