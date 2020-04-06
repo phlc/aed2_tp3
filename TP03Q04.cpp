@@ -4,13 +4,14 @@ Pedro Henrique Lima Carvalho
 Matricula: 651230
 AEDs 2
 
-TP03 - Q03
+TP03 - Q04
 */
 
 //dependencias
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 // ----------------------------------- Personagem  ---------------------------------
 
@@ -294,6 +295,53 @@ void preencherPersonagem(Personagem* p_person, char* s){
 	strcpy(p_person->homeworld, buffer[8]);
 		
 }
+
+/**
+*compare - compara dois Personagens de acordo com a operacao. Nome como desempate
+*@param Lista*, Persongem* 1, Personagem* 2, int operacao
+*@return double <0 se 1 menor que 2, 0 se iguais, >0 se 1 maior que 2
+*/
+double compare(Personagem* p_person1, Personagem* p_person2, int op){
+	double resp = 0;
+	
+	switch(op){
+		case 1:
+		 resp = p_person1->altura - p_person2->altura;
+		 break;
+		case 2:
+		 resp = p_person1->peso - p_person2->peso;
+		 break;
+		case 3:
+		 resp = strcmp(p_person1->corDoCabelo, p_person2->corDoCabelo);
+		 break;
+		case 4:
+		 resp = strcmp(p_person1->corDaPele, p_person2->corDaPele);
+		 break;
+		case 5:
+		 resp = strcmp(p_person1->corDosOlhos, p_person2->corDosOlhos);
+		 break;
+		case 6:
+		 resp = strcmp(p_person1->anoNascimento, p_person2->anoNascimento);
+		 break;
+		case 7:
+		 resp = strcmp(p_person1->genero, p_person2->genero);
+		 break;
+		case 8:
+		 resp = strcmp(p_person1->homeworld, p_person2->homeworld);
+		 break;
+		default:
+		 resp = strcmp(p_person1->nome, p_person2->nome);
+
+	}
+	
+	if (resp == 0){
+		resp = strcmp(p_person1->nome, p_person2->nome);
+	}
+
+	return resp;
+} 
+
+
 //------------------------------------ Celula ----------------------------------------------
 
 /**
@@ -301,7 +349,8 @@ void preencherPersonagem(Personagem* p_person, char* s){
 */
 typedef struct Celula{
  
- //atributos 
+ //atributos
+	Celula* ant;
 	Personagem* elemento;
 	Celula* prox;
 
@@ -311,145 +360,108 @@ typedef struct Celula{
 	Celula* construtorCelula (Personagem* p){
 		Celula* cel = (Celula*) malloc(sizeof(Celula));
 		
+		cel->ant = NULL;
 		cel->elemento = p;
 		cel->prox = NULL;
 		
 		return cel;
 	}
 
-//------------------------------- Fila Flexivel "Circular" ---------------------------------
+//------------------------------- Lista Flexivel -------------------------------------------
 
 /**
-*struct Fila
+*struct Lista
 */
-typedef struct Fila{
+typedef struct Lista{
  
 //atributos
-	int tamanho;
-	int ocupados;
 	Celula* primeiro;
 	Celula* ultimo;
-}Fila;
+}Lista;
 
 //construtor
 /**
-*construtorFila - inicializa uma Fila
+*construtorLista - inicializa uma Lista
 *@param int tamanho
 *@return list*
 */
-Fila* construtorFila (int size){
+Lista* construtorLista (){
 
-	Fila* p_fila;
-
-	if (size < 1){
-		printf("%s\n", "Erro - Tamanho da Lista Invalido");
-	}
-	else{
-		p_fila = (Fila*) malloc (sizeof(Fila)*1);	
-		p_fila->tamanho = size;
-		p_fila->ocupados = 0;
-		p_fila->primeiro = construtorCelula (NULL);
-		p_fila->ultimo = p_fila->primeiro;
-	}
-	return p_fila;
+	Lista* p_lista;
+	p_lista = (Lista*) malloc (sizeof(Lista));	
+	p_lista->primeiro = construtorCelula (NULL);
+	p_lista->ultimo = p_lista->primeiro;
+	
+	return p_lista;
 }
 
 //metodos
 
 /**
-*desenfileirar - remove um elemento inicio da fila
+*removerInicio - remove um elemento inicio da lista
 *@return Personagem*
 */
-Personagem* desenfileirar (Fila* p_fila){
+Personagem* RemoverInicio (Lista* p_lista){
 	Personagem* p_person;
 
-	if (p_fila->primeiro == p_fila->ultimo){
-		printf("%s\n", "Erro - fila Vazia");
+	if (p_lista->primeiro == p_lista->ultimo){
+		printf("%s\n", "Erro - Lista Vazia");
 	}
 	else{
-		Celula* tmp = p_fila->primeiro;
-		p_fila->primeiro = p_fila->primeiro->prox;
-		p_person = p_fila->primeiro->elemento;
-		p_fila->primeiro->elemento=NULL;
-		p_fila->ocupados--;
+		Celula* tmp = p_lista->primeiro;
+		p_lista->primeiro = p_lista->primeiro->prox;
+		p_person = p_lista->primeiro->elemento;
+		p_lista->primeiro->ant=NULL;
+		p_lista->primeiro->elemento=NULL;
 		free(tmp);
 		
 	}
 	return p_person;
 }
 
-//declaracao de mediaAlturas
-void mediaAltura(Fila* p_fila);
 
 /**
-*enfileirar - insere um elemento no final da fila
-*@param Fila* Personagem*
+*inserirFim - insere um elemento no final da lista
+*@param Lista* Personagem*
 */
-void enfileirar(Fila* p_fila, Personagem* p_person){
-	if (p_fila->ocupados < p_fila->tamanho){
-
-		p_fila->ultimo->prox = construtorCelula(p_person);
-		p_fila->ultimo=p_fila->ultimo->prox;
-		p_fila->ocupados++;		
-
-		//media alturas
-		mediaAltura(p_fila);
-
-	}
-	else{
-		Personagem* p = desenfileirar (p_fila);
-		freePerson(p);
-		enfileirar(p_fila, p_person);
-	}
+void inserirFim(Lista* p_lista, Personagem* p_person){
 	
-	
+	p_lista->ultimo->prox = construtorCelula(p_person);
+	p_lista->ultimo->prox->ant = p_lista->ultimo;
+	p_lista->ultimo=p_lista->ultimo->prox;		
 }
 
 /**
-*mostrar fila
-*@param Fila*
+*mostrar lista
+*@param Lista*
 */
-void mostrar(Fila* p_fila){
+void mostrar(Lista* p_lista){
 	int j=0;
-	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox, j++){
+	for (Celula* i=p_lista->primeiro->prox; i!=NULL; i=i->prox, j++){
 		printf("%s%d%s", "[", j, "] ");
 		imprimir(i->elemento);
 	} 
 }
 
-/**
-*comandos - executa os comandos contidos em uma string
-*@param Fila*. char* com comando
+/**mostrar2 - fila sem posicao
+*@param Fila*
 */
-void comandos (Fila* p_fila, char* input){
-	char* cmd;
-	char* path;
-	Personagem* p_person;
-
-	cmd = strtok(input, " ");
-
-	if (strcmp(cmd, "I")==0){
-		path = strtok (NULL, " ");
-		p_person = constructor2(path);
-		enfileirar(p_fila, p_person);
-	}	
-
-	if (strcmp(cmd, "R")==0){
-		p_person = desenfileirar(p_fila);
-		printf("%s%s\n", "(R) ", p_person->nome);
-		freePerson(p_person);
+void mostrar2(Lista* p_lista){
+	for (Celula* i=p_lista->primeiro->prox; i!=NULL; i=i->prox){
+		imprimir(i->elemento);
 	}
 }
 
+
 /**
-*freeFila - libera a memoria da fila
+*freeLista - libera a memoria da Lista
 *@param Lista*
 */
-void freeFila (Fila* p_fila){
+void freeLista (Lista* p_Lista){
 	
-	Celula* i = p_fila->primeiro->prox;
-	free(p_fila->primeiro);
-	p_fila->ultimo=NULL;
+	Celula* i = p_Lista->primeiro->prox;
+	free(p_Lista->primeiro);
+	p_Lista->ultimo=NULL;
 	if (i!=NULL){
 		for (Celula* j = i->prox; j!=NULL; j=j->prox){
 			freePerson(i->elemento);
@@ -459,25 +471,90 @@ void freeFila (Fila* p_fila){
 		freePerson(i->elemento);
 		free(i);
 	}
-	free(p_fila);
+	free(p_Lista);
 }
 
 /**
-*mediaAlturas
-*@param Fila*
+*swap - troca de posicao dois elementos da lista
+*@param Celula* i, Celula* j
 */
-void mediaAltura(Fila* p_fila){
-	double m = 0.0;
-	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox){
-		m = m + i->elemento->altura;
-	}
-	m = m/(p_fila->ocupados);
-	
-	if (m-(int)m >= 0.5)
-		m += 0.5;
-	printf("%d\n",(int) m);
+void swap(Celula* i, Celula* j){
+	Personagem* buffer = i->elemento;
+	i->elemento = j->elemento;
+	j->elemento = buffer;
 }
 
+/**
+*getPivo - retorna o Personagem* pivo
+*@param Celula* i, Celula* j
+*@return Personagem* p_person
+*/
+Personagem* getPivo (Celula* i, Celula* j){
+	int tam = 0;
+	Celula* tmp;
+	for (tmp=i; tmp!=j; tmp=tmp->prox, tam++);
+
+	tam=tam/2;
+	
+	tmp=i;
+	for(int k=0; k<tam; k++){
+		tmp=tmp->prox;
+	}
+	return(tmp->elemento);
+}
+
+/**
+*QuickSort - quicksort
+*@param Celula* esq, Celula* dir, int log[]
+*/
+void quickSort (Celula* esq, Celula* dir, int log[]){
+	
+	Celula* i = esq;
+	Celula* j = dir;
+
+	Personagem* pivo = getPivo(i, j);
+       
+	while (i->ant!=j && j->prox!=i && i->ant!=j->prox){
+		
+		log[0]+=2;		
+
+		while (compare(i->elemento, pivo, 3)<0.0){
+			i=i->prox;
+
+			log[0]++;
+		}
+		while (compare(j->elemento, pivo, 3)>0.0){
+			j=j->ant;
+
+			log[0]++;
+		}
+
+		if(i->ant!=j && j->prox!=i && i->ant!=j->prox){
+			swap(i,j);
+			i=i->prox;
+			j=j->ant;
+
+			log[1]+=3;
+		}
+	}
+
+        if (j->prox!=esq && j!=esq){
+		quickSort(esq, j, log);
+	}
+	if (i!=dir && i!=NULL){
+		quickSort(i, dir, log);
+	}
+
+	
+}
+
+/**
+*ordenarQuickSort - ordena a lista pelo metodo quicksort
+*@param Lista* p_lista, int log[]
+*/	
+void ordenarQuickSort(Lista* p_lista, int log[]){
+	quickSort(p_lista->primeiro->prox, p_lista->ultimo, log);
+}
 
 //----------------------------------- Main ---------------------------------
 
@@ -487,8 +564,8 @@ void mediaAltura(Fila* p_fila){
 */
 int  main(void){
         
-	Fila* p_fila = construtorFila(5);
-
+	Lista* p_lista = construtorLista();
+	int log[] = {0,0};
 	Personagem* p;
 	char* input = (char*) malloc(sizeof(char) * 100);
 
@@ -497,23 +574,24 @@ int  main(void){
 		
 	while(!isFim(input)){
 		p = constructor2(input);
-		enfileirar(p_fila, p);
+		inserirFim(p_lista, p);
 		fgets(input, 99, stdin);
 		input[strlen(input)-1]='\0';
 	}	
-	int n = 0;
+	clock_t inicio = clock();
+	ordenarQuickSort(p_lista, log);
+	clock_t fim = clock();
 
-	fgets(input, 99, stdin);
-	input[strlen(input)-1]='\0';
-	sscanf(input, "%d", &n);
+	mostrar2(p_lista);
 
-	for (int i=0; i<n; i++){
-		fgets(input, 99, stdin);
-		input[strlen(input)-1]='\0';
-		comandos(p_fila, input);
-	}
-	mostrar(p_fila);
-	freeFila(p_fila);
+	double segundos = (fim - inicio) / (double)CLOCKS_PER_SEC / 1000.0;
+
+	//arquivo log
+	FILE* arq = fopen("651230_quicksort2.txt", "wt");
+	fprintf (arq, "%s\t%d\t%d\t%lf","651230", log[0], log[1], segundos);
+	fclose(arq);
+
+	freeLista(p_lista);
 }	
 
 
