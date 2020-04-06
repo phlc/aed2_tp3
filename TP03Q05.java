@@ -114,8 +114,11 @@ class Matrix{
 	/*
 	*mostrarPrincipal - mostra a diagonal Principal
 	*/
-	public void mostrarPrincipal(){
+	public void mostrarPrincipal() throws Exception{
 		Celula i = inicio;
+		
+		if(nLinhas()!=nColunas())
+			throw new Exception("Matriz nao Quadrada");
 
 		while(i!=null){
 			MyIO.print(i.elemento+" ");
@@ -130,8 +133,12 @@ class Matrix{
 	/*
 	*mostrarSecundaria - Mostra a diagonal secundaria
 	*/
-	public void mostrarSecundaria(){
+	public void mostrarSecundaria() throws Exception{
 		Celula i = inicio;
+		
+		if(nLinhas()!=nColunas())
+			throw new Exception("Matriz nao Quadrada");
+
 		for(; i.dir!=null; i=i.dir);
 	
 		while(i!=null){
