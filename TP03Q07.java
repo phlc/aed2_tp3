@@ -680,7 +680,7 @@ class Lista{
 /**
 *Classe Main
 */
-public class TP03Q04{
+public class TP03Q07{
   		
 	/**
 	*tempo
@@ -721,7 +721,7 @@ public class TP03Q04{
 		double segundos = ((double)(fim-inicio))/1000.0;
 		
 		//arquivo log
-		Arq.openWrite("651230_quicksort2.txt");
+		Arq.openWrite("651230_quicksort3.txt");
 		Arq.print("651230\t"+log[0]+"\t"+log[1]+"\t"+segundos);
 		Arq.close();		
 
