@@ -412,8 +412,10 @@ void enfileirar(Fila* p_fila, Personagem* p_person){
 */
 void mostrar(Fila* p_fila){
 	int j=0;
+
 	for (Celula* i=p_fila->primeiro; i!=p_fila->ultimo; i=i->prox, j++){
 		printf("%s%d%s", "[", j, "] ");
+i->elemento->peso=0;
 		imprimir(i->elemento);
 	} 
 }
@@ -451,7 +453,9 @@ void freeFila (Fila* p_fila){
 	Celula* i = p_fila->primeiro;
 	while (i!=p_fila->ultimo){
 		freePerson(i->elemento);
+		i=i->prox;
 	}
+
 	p_fila->ultimo=NULL;
 	
 	Celula* j = i = p_fila->primeiro->prox;
@@ -461,6 +465,7 @@ void freeFila (Fila* p_fila){
 		i=j;
 	}
 	free(p_fila->primeiro);
+
 	free(p_fila);
 }
 
