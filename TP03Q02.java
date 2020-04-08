@@ -517,7 +517,7 @@ public class TP03Q02{
 		}
 
 		//zerar peso
-//		stack.zerarPeso();
+		stack.zerarPeso();
 
 		stack.mostrarInv();
 	}	
