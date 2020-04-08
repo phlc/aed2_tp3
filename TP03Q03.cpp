@@ -325,8 +325,6 @@ typedef struct Celula{
 typedef struct Fila{
  
 //atributos
-	int tamanho;
-	int ocupados;
 	Celula* primeiro;
 	Celula* ultimo;
 }Fila;
@@ -346,9 +344,15 @@ Fila* construtorFila (int size){
 	}
 	else{
 		p_fila = (Fila*) malloc (sizeof(Fila)*1);	
-		p_fila->tamanho = size;
-		p_fila->ocupados = 0;
 		p_fila->primeiro = construtorCelula (NULL);
+
+		Celula* c = p_fila->primeiro;
+		for(int i=0; i<size; i++){
+			c->prox = construtorCelula(NULL);
+			c=c->prox;
+		}
+		
+		c->prox=p_fila->primeiro;
 		p_fila->ultimo = p_fila->primeiro;
 	}
 	return p_fila;
@@ -369,10 +373,8 @@ Personagem* desenfileirar (Fila* p_fila){
 	else{
 		Celula* tmp = p_fila->primeiro;
 		p_fila->primeiro = p_fila->primeiro->prox;
-		p_person = p_fila->primeiro->elemento;
-		p_fila->primeiro->elemento=NULL;
-		p_fila->ocupados--;
-		free(tmp);
+		p_person = tmp->elemento;
+		tmp->elemento=NULL;
 		
 	}
 	return p_person;
@@ -386,11 +388,10 @@ void mediaAltura(Fila* p_fila);
 *@param Fila* Personagem*
 */
 void enfileirar(Fila* p_fila, Personagem* p_person){
-	if (p_fila->ocupados < p_fila->tamanho){
+	if (p_fila->ultimo->prox != p_fila->primeiro){
 
-		p_fila->ultimo->prox = construtorCelula(p_person);
+		p_fila->ultimo->elemento = p_person;
 		p_fila->ultimo=p_fila->ultimo->prox;
-		p_fila->ocupados++;		
 
 		//media alturas
 		mediaAltura(p_fila);
@@ -411,7 +412,7 @@ void enfileirar(Fila* p_fila, Personagem* p_person){
 */
 void mostrar(Fila* p_fila){
 	int j=0;
-	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox, j++){
+	for (Celula* i=p_fila->primeiro; i!=p_fila->ultimo; i=i->prox, j++){
 		printf("%s%d%s", "[", j, "] ");
 		imprimir(i->elemento);
 	} 
@@ -447,18 +448,19 @@ void comandos (Fila* p_fila, char* input){
 */
 void freeFila (Fila* p_fila){
 	
-	Celula* i = p_fila->primeiro->prox;
-	free(p_fila->primeiro);
-	p_fila->ultimo=NULL;
-	if (i!=NULL){
-		for (Celula* j = i->prox; j!=NULL; j=j->prox){
-			freePerson(i->elemento);
-			free(i);
-			i=j;
-		}	
+	Celula* i = p_fila->primeiro;
+	while (i!=p_fila->ultimo){
 		freePerson(i->elemento);
-		free(i);
 	}
+	p_fila->ultimo=NULL;
+	
+	Celula* j = i = p_fila->primeiro->prox;
+	while(i!=p_fila->primeiro){
+		j=j->prox;
+		free(i);
+		i=j;
+	}
+	free(p_fila->primeiro);
 	free(p_fila);
 }
 
@@ -468,10 +470,12 @@ void freeFila (Fila* p_fila){
 */
 void mediaAltura(Fila* p_fila){
 	double m = 0.0;
-	for (Celula* i=p_fila->primeiro->prox; i!=NULL; i=i->prox){
+	int ocupados = 0;
+	for (Celula* i=p_fila->primeiro; i!=p_fila->ultimo; i=i->prox){
 		m = m + i->elemento->altura;
+		ocupados++;
 	}
-	m = m/(p_fila->ocupados);
+	m = m/(ocupados);
 	
 	if (m-(int)m >= 0.5)
 		m += 0.5;
